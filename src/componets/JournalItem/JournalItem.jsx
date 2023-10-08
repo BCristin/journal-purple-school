@@ -1,6 +1,7 @@
 import styles from './JournalItem.module.scss';
 export const JournalItem = ({ title, date, text }) => {
-	const formateDate = new Intl.DateTimeFormat('ro-RO').format(date);
+	const converDate = new Date(date);
+	const formateDate = new Intl.DateTimeFormat('ro-RO').format(converDate);
 	return (
 		<div className={styles['journal-item']}>
 			<h2 className={styles['journal-item__header']}>{title}</h2>

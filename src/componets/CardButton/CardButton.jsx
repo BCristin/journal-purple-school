@@ -1,6 +1,10 @@
 import styles from './CardButton.module.scss';
 
-export const CardButton = ({ children, className }) => {
+export const CardButton = ({ children, className, ...props }) => {
 	const cl = styles['card-button'] + (className ? ' ' + className : '');
-	return <button className={cl}>{children}</button>;
+	return (
+		<button {...props} className={cl}>
+			{children}
+		</button>
+	);
 };
