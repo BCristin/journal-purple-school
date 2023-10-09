@@ -1,10 +1,19 @@
-import { useContext } from 'react';
+import { useContext, useRef, useState } from 'react';
 import UserContext from '../../context/user.context';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import styles from './JournalForm.module.scss';
-
+const defaultValueForm = {
+	title: '',
+	date: new Date().toISOString().split('T')[0],
+	tag: '',
+	text: '',
+};
 export const JournalForm = () => {
+	const [inputData, setInputData] = useState(defaultValueForm);
+	const inputRef = useRef();
+	const inputRef2 = useRef();
+
 	const { data, addJurnal } = useContext(UserContext);
 	const activeUserID = data.setting.activeUserID;
 	console.log(data);
@@ -13,26 +22,22 @@ export const JournalForm = () => {
 		const formData = new FormData(e.target);
 		const formProps = Object.fromEntries(formData);
 
-		// const newDatas = (value) => [
-		// 	{ ...formProps, id: Math.max(...value.map((i) => i.id)) + 1 },
-		// 	...value,
-		// ];
-
-		const isValid = Object.values(formProps).every(
-			(value) => value !== null && value !== undefined && value.trim() !== '',
-		);
+		const isValid = Object.values(formProps).every((value) => value.trim() !== '');
 
 		if (isValid) {
 			addJurnal(formProps, activeUserID);
-
-			// console.log(newDatas, JSON.stringify(newDatas));
+			setInputData(defaultValueForm);
+		} else {
+			if (formProps.title === '') {
+				inputRef.current.focus();
+			} else if (formProps.text === '') inputRef2.current.focus();
 		}
 	};
 
 	return (
 		<form onSubmit={addJournalItem} className={styles['journal-form']}>
 			<div className={styles['form-row']}>
-				<Input name="title" />
+				<Input name="title" inputData={inputData} setInputData={setInputData} inputRef={inputRef} />
 				<button className={styles['delete']} type="button">
 					<img src="/archive.svg" alt="Кнопка удалить" />
 				</button>
@@ -42,16 +47,27 @@ export const JournalForm = () => {
 					<img src="/calendar.svg" alt="Иконка календаря" />
 					<span>Дата</span>
 				</label>
-				<Input name="date" type="date" />
+				<Input name="date" type="date" inputData={inputData} setInputData={setInputData} />
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="tag" className={styles['form-label']}>
 					<img src="/folder.svg" alt="Иконка папки" />
 					<span>Метки</span>
 				</label>
-				<Input name="tag" />
+				<Input name="tag" inputData={inputData} setInputData={setInputData} />
 			</div>
-			<textarea name="text" id="post" cols="30" rows="10"></textarea>
+			<textarea
+				name="text"
+				id="post"
+				cols="30"
+				rows="10"
+				ref={inputRef2}
+				onChange={(e) =>
+					setInputData((v) => {
+						return { ...v, text: e.target.value };
+					})
+				}
+				value={inputData.text}></textarea>
 			<Button>Save</Button>
 		</form>
 	);
