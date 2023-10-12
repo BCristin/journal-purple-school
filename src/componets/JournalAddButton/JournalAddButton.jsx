@@ -1,9 +1,13 @@
+import { useContext } from 'react';
+import UserContext from '../../context/user.context';
 import { CardButton } from '../CardButton/CardButton';
 import styles from './JournalAddButton.module.scss';
 
 export const JournalAddButton = () => {
+	const { setActiveJurnal } = useContext(UserContext);
+
 	return (
-		<CardButton className={styles['journal-add']}>
+		<CardButton className={styles['journal-add']} onClick={() => setActiveJurnal('0')}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="20"

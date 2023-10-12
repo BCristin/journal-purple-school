@@ -6,11 +6,12 @@ import { JournalItem } from '../JournalItem/JournalItem';
 import styles from './JournalList.module.scss';
 
 export const JournalList = () => {
-	const { data } = useContext(UserContext);
+	const { data, setActiveJurnal } = useContext(UserContext);
 	const activeUser = data.setting.activeUserID;
+
 	const items = data.users[activeUser].jurnalItems;
 	const renderData = sortItems(items).map((item) => (
-		<CardButton key={item.id}>
+		<CardButton key={item.id} onClick={() => setActiveJurnal(item.id)}>
 			<JournalItem {...item} />
 		</CardButton>
 	));

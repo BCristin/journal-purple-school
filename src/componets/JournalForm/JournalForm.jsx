@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import UserContext from '../../context/user.context';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
@@ -14,15 +14,21 @@ export const JournalForm = () => {
 	const inputRef = useRef();
 	const inputRef2 = useRef();
 
-	const { data, addJurnal } = useContext(UserContext);
+	const { data, addJurnal, setActiveJurnal, deleteJurnal } = useContext(UserContext);
 	const activeUserID = data.setting.activeUserID;
-	console.log(data);
+	const activeJurnal = data.setting.activeJurnal;
+
+	useEffect(() => {
+		setActiveJurnal(0);
+	}, []);
+
 	const addJournalItem = (e) => {
 		e.preventDefault();
 		const formData = new FormData(e.target);
 		const formProps = Object.fromEntries(formData);
 
 		const isValid = Object.values(formProps).every((value) => value.trim() !== '');
+		formProps.id = activeJurnal;
 
 		if (isValid) {
 			addJurnal(formProps, activeUserID);
@@ -34,13 +40,31 @@ export const JournalForm = () => {
 		}
 	};
 
+	useEffect(() => {
+		if (!activeJurnal) {
+			setInputData(defaultValueForm);
+		}
+		if (data.activeJurnal !== 0) {
+			const newValue = data.users
+				.find((el) => el.id === activeUserID)
+				.jurnalItems.find((el) => el.id === activeJurnal);
+			// console.log({ ...newValue });
+			if (newValue)
+				setInputData({ ...newValue, date: new Date(newValue.date).toISOString().split('T')[0] });
+		}
+	}, [activeUserID, activeJurnal]);
 	return (
 		<form onSubmit={addJournalItem} className={styles['journal-form']}>
 			<div className={styles['form-row']}>
 				<Input name="title" inputData={inputData} setInputData={setInputData} inputRef={inputRef} />
-				<button className={styles['delete']} type="button">
-					<img src="/archive.svg" alt="Кнопка удалить" />
-				</button>
+				{activeJurnal > 0 && (
+					<button
+						className={styles['delete']}
+						type="button"
+						onClick={() => deleteJurnal(activeJurnal)}>
+						<img src="/archive.svg" alt="Кнопка удалить" />
+					</button>
+				)}
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="date" className={styles['form-label']}>
